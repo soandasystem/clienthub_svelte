@@ -13,6 +13,7 @@
     import Roles from "./views/admin/roles.svelte";
     import Users from "./views/admin/users.svelte";
     import Visit from "./views/admin/visit.svelte";
+    import Prospect from "./views/admin/prospect.svelte";
     import Placeholder from "./views/Placeholder.svelte";
 
     // Importamos CSS global
@@ -91,9 +92,9 @@
         </MainLayout>
     </Route>
 
-    <Route path="/admin/visits">
+    <Route path="/admin/prospect">
         <MainLayout>
-            <Visit />
+            <Prospect />
         </MainLayout>
     </Route>
 

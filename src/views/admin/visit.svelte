@@ -177,7 +177,8 @@
             direccion: "Av. Providencia 1234, Of. 602, Providencia",
             contacto: "Mariana Silva",
             telefono: "+56 9 8765 4321",
-            objetivo: "Reunión de seguimiento y cierre de contrato comercial anual",
+            objetivo:
+                "Reunión de seguimiento y cierre de contrato comercial anual",
             notas: "Llevar propuesta económica actualizada y catálogo de nuevos servicios.",
             status: "PROGRAMADA",
             createdBy: "Supervisor",
@@ -213,7 +214,8 @@
             direccion: "Av. Las Condes 890, Las Condes",
             contacto: "Felipe Soto",
             telefono: "+56 9 6543 2109",
-            objetivo: "Primera demostración de la plataforma y levantamiento de requerimientos",
+            objetivo:
+                "Primera demostración de la plataforma y levantamiento de requerimientos",
             notas: "Prospecto calificado con alto interés en el módulo de facturación.",
             status: "PROGRAMADA",
             createdBy: "Supervisor",
@@ -231,7 +233,8 @@
             direccion: "Av. Valparaíso 345, Viña del Mar",
             contacto: "Ignacio Herrera",
             telefono: "+56 9 1098 7654",
-            objetivo: "Negociación de volumen de compras para el próximo trimestre",
+            objetivo:
+                "Negociación de volumen de compras para el próximo trimestre",
             notas: "Preparar comparativa de costos y descuentos por volumen.",
             status: "PROGRAMADA",
             createdBy: "Supervisor",
@@ -251,11 +254,12 @@
         clienteName: "Comercial ABC",
         tipo: "CRM_CUSTOMER",
         fecha: "2026-10-31", // Ejemplo del supervisor
-        hora: "10:00",       // Ejemplo del supervisor
+        hora: "10:00", // Ejemplo del supervisor
         direccion: "Av. Providencia 1234, Of. 602, Providencia",
         contacto: "Mariana Silva",
         telefono: "+56 9 8765 4321",
-        objetivo: "Reunión de seguimiento comercial y presentación de propuesta",
+        objetivo:
+            "Reunión de seguimiento comercial y presentación de propuesta",
         notas: "",
     });
 
@@ -340,9 +344,17 @@
     const fetchApiUsers = async () => {
         try {
             const resp = await api.getData("users", "", "", "", schemaName);
-            if (resp && resp.status === "success" && Array.isArray(resp.data) && resp.data.length > 0) {
+            if (
+                resp &&
+                resp.status === "success" &&
+                Array.isArray(resp.data) &&
+                resp.data.length > 0
+            ) {
                 // Si la API tiene usuarios, combinamos los nombres manteniendo la estructura de clientes
-                console.log("[Visit] Usuarios cargados desde API:", resp.data.length);
+                console.log(
+                    "[Visit] Usuarios cargados desde API:",
+                    resp.data.length,
+                );
             }
         } catch (err) {
             console.warn("[Visit] Usando lista de vendedores configurada");
@@ -360,22 +372,38 @@
     // Guardar / Programar visita
     async function handleSubmit() {
         if (!form.vendedorId) {
-            Swal.fire("Atención", "Por favor seleccione un vendedor.", "warning");
+            Swal.fire(
+                "Atención",
+                "Por favor seleccione un vendedor.",
+                "warning",
+            );
             return;
         }
 
         if (!form.clienteId) {
-            Swal.fire("Atención", "Por favor seleccione un cliente de la lista.", "warning");
+            Swal.fire(
+                "Atención",
+                "Por favor seleccione un cliente de la lista.",
+                "warning",
+            );
             return;
         }
 
         if (!form.fecha) {
-            Swal.fire("Atención", "Por favor ingrese la fecha de la visita.", "warning");
+            Swal.fire(
+                "Atención",
+                "Por favor ingrese la fecha de la visita.",
+                "warning",
+            );
             return;
         }
 
         if (!form.hora) {
-            Swal.fire("Atención", "Por favor ingrese la hora de la visita.", "warning");
+            Swal.fire(
+                "Atención",
+                "Por favor ingrese la hora de la visita.",
+                "warning",
+            );
             return;
         }
 
@@ -417,7 +445,9 @@
 
             // Intentar notificar a la API si está disponible
             try {
-                api.setData("visits", newVisit, "", "", schemaName).catch(() => {});
+                api.setData("visits", newVisit, "", "", schemaName).catch(
+                    () => {},
+                );
             } catch (e) {}
 
             visits = [newVisit, ...visits];
@@ -430,7 +460,7 @@
                 html: `
                     <div class="text-start fs-6 p-2">
                         <p class="mb-1"><strong>Vendedor:</strong> ${form.vendedorName}</p>
-                        <p class="mb-1"><strong>Cliente:</strong> ${form.clienteName} <span class="badge ${form.tipo === 'CRM_CUSTOMER' ? 'bg-primary' : 'bg-warning text-dark'}">${form.tipo}</span></p>
+                        <p class="mb-1"><strong>Cliente:</strong> ${form.clienteName} <span class="badge ${form.tipo === "CRM_CUSTOMER" ? "bg-primary" : "bg-warning text-dark"}">${form.tipo}</span></p>
                         <p class="mb-1"><strong>Fecha:</strong> ${dayjs(form.fecha).format("DD/MM/YYYY")}</p>
                         <p class="mb-0"><strong>Hora:</strong> ${form.hora} hrs</p>
                     </div>
@@ -540,26 +570,11 @@
             if (result.isConfirmed) {
                 visits = visits.filter((v) => v.id !== visit.id);
                 saveToLocalStorage(visits);
-                Swal.fire("Eliminada", "La visita se ha eliminado del programa.", "success");
-            }
-        });
-    }
-
-    // Restablecer visitas demo iniciales
-    function handleResetDemoData() {
-        Swal.fire({
-            title: "¿Restablecer datos de ejemplo?",
-            text: "Se recargarán las visitas predeterminadas, incluyendo el ejemplo del supervisor.",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#2563eb",
-            confirmButtonText: "Sí, restablecer",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                visits = [...initialVisits];
-                saveToLocalStorage(visits);
-                Swal.fire("Restablecido", "Datos iniciales cargados.", "success");
+                Swal.fire(
+                    "Eliminada",
+                    "La visita se ha eliminado del programa.",
+                    "success",
+                );
             }
         });
     }
@@ -616,30 +631,22 @@
 
 <div class="visit-page-container">
     <!-- Header principal -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 pb-2 border-bottom">
+    <div
+        class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 pb-2 border-bottom"
+    >
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary px-2.5 py-1.5 fs-7 rounded-2">
-                    <i class="fa fa-calendar-check me-1"></i> Módulo de Supervisión
-                </span>
-                <span class="text-muted fs-7">Control de Gestión de Ventas</span>
+                <span class="text-muted fs-7">Control de Gestión de Ventas</span
+                >
             </div>
             <h1 class="h3 fw-bold text-gray-900 mb-0">Programa de Visitas</h1>
             <p class="text-secondary small mb-0">
-                Planificación de visitas comerciales a clientes CRM y prospectos asignados por vendedor.
+                Planificación de visitas comerciales a clientes CRM y prospectos
+                asignados por vendedor.
             </p>
         </div>
 
         <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-            <button
-                class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"
-                on:click={handleResetDemoData}
-                title="Recargar datos de ejemplo"
-            >
-                <i class="fa fa-rotate-right"></i>
-                <span class="d-none d-sm-inline">Restablecer Demo</span>
-            </button>
-
             <button
                 class="btn btn-sm btn-primary d-flex align-items-center gap-1.5 shadow-sm"
                 on:click={openNewVisitModal}
@@ -653,14 +660,26 @@
     <!-- Tarjetas de métricas para el supervisor -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
-            <div class="card metric-card shadow-sm border-0 border-start border-4 border-primary h-100">
+            <div
+                class="card metric-card shadow-sm border-0 border-start border-4 border-primary h-100"
+            >
                 <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                    >
                         <div>
-                            <div class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1">Total Visitas</div>
-                            <div class="h3 fw-bold text-gray-900 mb-0">{statsTotal}</div>
+                            <div
+                                class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1"
+                            >
+                                Total Visitas
+                            </div>
+                            <div class="h3 fw-bold text-gray-900 mb-0">
+                                {statsTotal}
+                            </div>
                         </div>
-                        <div class="metric-icon-box bg-primary-subtle text-primary">
+                        <div
+                            class="metric-icon-box bg-primary-subtle text-primary"
+                        >
                             <i class="fa fa-calendar-days fs-5"></i>
                         </div>
                     </div>
@@ -669,12 +688,22 @@
         </div>
 
         <div class="col-6 col-lg-3">
-            <div class="card metric-card shadow-sm border-0 border-start border-4 border-info h-100">
+            <div
+                class="card metric-card shadow-sm border-0 border-start border-4 border-info h-100"
+            >
                 <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                    >
                         <div>
-                            <div class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1">Clientes CRM</div>
-                            <div class="h3 fw-bold text-info mb-0">{statsCrm}</div>
+                            <div
+                                class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1"
+                            >
+                                Clientes CRM
+                            </div>
+                            <div class="h3 fw-bold text-info mb-0">
+                                {statsCrm}
+                            </div>
                         </div>
                         <div class="metric-icon-box bg-info-subtle text-info">
                             <i class="fa fa-user-check fs-5"></i>
@@ -685,14 +714,26 @@
         </div>
 
         <div class="col-6 col-lg-3">
-            <div class="card metric-card shadow-sm border-0 border-start border-4 border-warning h-100">
+            <div
+                class="card metric-card shadow-sm border-0 border-start border-4 border-warning h-100"
+            >
                 <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                    >
                         <div>
-                            <div class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1">Prospectos</div>
-                            <div class="h3 fw-bold text-warning-emphasis mb-0">{statsProspect}</div>
+                            <div
+                                class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1"
+                            >
+                                Prospectos
+                            </div>
+                            <div class="h3 fw-bold text-warning-emphasis mb-0">
+                                {statsProspect}
+                            </div>
                         </div>
-                        <div class="metric-icon-box bg-warning-subtle text-warning-emphasis">
+                        <div
+                            class="metric-icon-box bg-warning-subtle text-warning-emphasis"
+                        >
                             <i class="fa fa-user-plus fs-5"></i>
                         </div>
                     </div>
@@ -701,14 +742,26 @@
         </div>
 
         <div class="col-6 col-lg-3">
-            <div class="card metric-card shadow-sm border-0 border-start border-4 border-success h-100">
+            <div
+                class="card metric-card shadow-sm border-0 border-start border-4 border-success h-100"
+            >
                 <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                    >
                         <div>
-                            <div class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1">Programadas</div>
-                            <div class="h3 fw-bold text-success mb-0">{statsPending}</div>
+                            <div
+                                class="text-uppercase tracking-wider fs-8 fw-bold text-muted mb-1"
+                            >
+                                Programadas
+                            </div>
+                            <div class="h3 fw-bold text-success mb-0">
+                                {statsPending}
+                            </div>
                         </div>
-                        <div class="metric-icon-box bg-success-subtle text-success">
+                        <div
+                            class="metric-icon-box bg-success-subtle text-success"
+                        >
                             <i class="fa fa-clock fs-5"></i>
                         </div>
                     </div>
@@ -728,22 +781,38 @@
             role="dialog"
             aria-modal="true"
             on:click|self={closeModal}
-            on:keydown={(e) => e.key === 'Escape' && closeModal()}
+            on:keydown={(e) => e.key === "Escape" && closeModal()}
         >
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div
+                class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+            >
                 <div class="modal-content border-0 shadow-lg">
                     <!-- Modal Header -->
-                    <div class="modal-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+                    <div
+                        class="modal-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between"
+                    >
                         <div class="d-flex align-items-center gap-2.5">
-                            <div class="header-icon-circle bg-primary text-white">
-                                <i class="fa {isEditing ? 'fa-pencil' : 'fa-calendar-plus'}"></i>
+                            <div
+                                class="header-icon-circle bg-primary text-white"
+                            >
+                                <i
+                                    class="fa {isEditing
+                                        ? 'fa-pencil'
+                                        : 'fa-calendar-plus'}"
+                                ></i>
                             </div>
                             <div>
-                                <h5 class="modal-title fw-bold text-dark mb-0 fs-6">
-                                    {isEditing ? "Modificar Visita Programada" : "Ingreso al Programa de Visitas"}
+                                <h5
+                                    class="modal-title fw-bold text-dark mb-0 fs-6"
+                                >
+                                    {isEditing
+                                        ? "Modificar Visita Programada"
+                                        : "Ingreso al Programa de Visitas"}
                                 </h5>
                                 <small class="text-muted fs-8">
-                                    El supervisor selecciona el vendedor, elige el cliente/prospecto y asigna la fecha y hora.
+                                    El supervisor selecciona el vendedor, elige
+                                    el cliente/prospecto y asigna la fecha y
+                                    hora.
                                 </small>
                             </div>
                         </div>
@@ -762,8 +831,14 @@
                             <div class="row g-3">
                                 <!-- 1. VENDEDOR (DROPDOWN) -->
                                 <div class="col-12 col-md-6">
-                                    <label for="vendedorSelect" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-user-tie text-primary me-1"></i> Vendedor:
+                                    <label
+                                        for="vendedorSelect"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-user-tie text-primary me-1"
+                                        ></i>
+                                        Vendedor:
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select
@@ -773,16 +848,20 @@
                                         on:change={handleVendedorChange}
                                         required
                                     >
-                                        <option value="" disabled>-- Seleccione Vendedor --</option>
+                                        <option value="" disabled
+                                            >-- Seleccione Vendedor --</option
+                                        >
                                         {#each vendedores as vend}
                                             <option value={vend.id}>
-                                                {vend.name} ({vend.clients.length} clientes)
+                                                {vend.name} ({vend.clients
+                                                    .length} clientes)
                                             </option>
                                         {/each}
                                     </select>
                                     <div class="form-text fs-8 text-muted">
                                         {#if selectedVendedor}
-                                            <i class="fa fa-map-pin me-1"></i> {selectedVendedor.zone}
+                                            <i class="fa fa-map-pin me-1"></i>
+                                            {selectedVendedor.zone}
                                         {:else}
                                             Selecciona el vendedor asignado.
                                         {/if}
@@ -791,8 +870,14 @@
 
                                 <!-- 2. CLIENTE DEL VENDEDOR (DROPDOWN DINÁMICO) -->
                                 <div class="col-12 col-md-6">
-                                    <label for="clienteSelect" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-building text-primary me-1"></i> Cliente / Prospecto:
+                                    <label
+                                        for="clienteSelect"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-building text-primary me-1"
+                                        ></i>
+                                        Cliente / Prospecto:
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select
@@ -804,55 +889,86 @@
                                         required
                                     >
                                         {#if availableClients.length === 0}
-                                            <option value="">-- Sin clientes para este vendedor --</option>
+                                            <option value=""
+                                                >-- Sin clientes para este
+                                                vendedor --</option
+                                            >
                                         {:else}
-                                            <option value="" disabled>-- Seleccione Cliente del Vendedor --</option>
+                                            <option value="" disabled
+                                                >-- Seleccione Cliente del
+                                                Vendedor --</option
+                                            >
                                             {#each availableClients as cli}
                                                 <option value={cli.id}>
-                                                    {cli.name} — [{cli.type === 'CRM_CUSTOMER' ? 'Cliente CRM' : 'Prospecto'}]
+                                                    {cli.name} — [{cli.type ===
+                                                    "CRM_CUSTOMER"
+                                                        ? "Cliente CRM"
+                                                        : "Prospecto"}]
                                                 </option>
                                             {/each}
                                         {/if}
                                     </select>
                                     <div class="form-text fs-8 text-muted">
-                                        Clientes y prospectos asignados al vendedor.
+                                        Clientes y prospectos asignados al
+                                        vendedor.
                                     </div>
                                 </div>
 
                                 <!-- 3. TIPO (CRM_CUSTOMER vs PROSPECT) -->
                                 <div class="col-12 col-md-6">
-                                    <label for="tipoClienteInput" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-tag text-primary me-1"></i> Tipo de Cliente:
+                                    <label
+                                        for="tipoClienteInput"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i class="fa fa-tag text-primary me-1"
+                                        ></i> Tipo de Cliente:
                                     </label>
                                     <div class="input-group">
                                         <input
                                             id="tipoClienteInput"
                                             type="text"
                                             class="form-control fw-bold bg-white"
-                                            value={form.tipo || 'Sin selección'}
+                                            value={form.tipo || "Sin selección"}
                                             readonly
                                         />
-                                        {#if form.tipo === 'CRM_CUSTOMER'}
-                                            <span class="input-group-text bg-primary text-white fs-7">
-                                                <i class="fa fa-shield-check me-1"></i> CRM
+                                        {#if form.tipo === "CRM_CUSTOMER"}
+                                            <span
+                                                class="input-group-text bg-primary text-white fs-7"
+                                            >
+                                                <i
+                                                    class="fa fa-shield-check me-1"
+                                                ></i> CRM
                                             </span>
-                                        {:else if form.tipo === 'PROSPECT'}
-                                            <span class="input-group-text bg-warning text-dark fs-7">
-                                                <i class="fa fa-bullseye me-1"></i> Prospecto
+                                        {:else if form.tipo === "PROSPECT"}
+                                            <span
+                                                class="input-group-text bg-warning text-dark fs-7"
+                                            >
+                                                <i class="fa fa-bullseye me-1"
+                                                ></i> Prospecto
                                             </span>
                                         {:else}
-                                            <span class="input-group-text bg-light text-muted fs-7">-</span>
+                                            <span
+                                                class="input-group-text bg-light text-muted fs-7"
+                                                >-</span
+                                            >
                                         {/if}
                                     </div>
                                     <div class="form-text fs-8 text-muted">
-                                        Asignado automáticamente según el cliente.
+                                        Asignado automáticamente según el
+                                        cliente.
                                     </div>
                                 </div>
 
                                 <!-- 4. FECHA DE LA VISITA -->
                                 <div class="col-12 col-sm-6 col-md-3">
-                                    <label for="fechaVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-calendar-day text-primary me-1"></i> Fecha:
+                                    <label
+                                        for="fechaVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-calendar-day text-primary me-1"
+                                        ></i>
+                                        Fecha:
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input
@@ -863,14 +979,23 @@
                                         required
                                     />
                                     <div class="form-text fs-8 text-muted">
-                                        {form.fecha ? dayjs(form.fecha).format("DD/MM/YYYY") : "dd/mm/aaaa"}
+                                        {form.fecha
+                                            ? dayjs(form.fecha).format(
+                                                  "DD/MM/YYYY",
+                                              )
+                                            : "dd/mm/aaaa"}
                                     </div>
                                 </div>
 
                                 <!-- 5. HORA DE LA VISITA -->
                                 <div class="col-12 col-sm-6 col-md-3">
-                                    <label for="horaVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-clock text-primary me-1"></i> Hora:
+                                    <label
+                                        for="horaVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i class="fa fa-clock text-primary me-1"
+                                        ></i>
+                                        Hora:
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input
@@ -887,8 +1012,13 @@
 
                                 <!-- 6. DIRECCIÓN -->
                                 <div class="col-12 col-md-6">
-                                    <label for="direccionVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-location-dot text-primary me-1"></i> Dirección:
+                                    <label
+                                        for="direccionVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-location-dot text-primary me-1"
+                                        ></i> Dirección:
                                     </label>
                                     <input
                                         id="direccionVisita"
@@ -904,8 +1034,13 @@
 
                                 <!-- 7. CONTACTO / TELÉFONO -->
                                 <div class="col-12 col-md-6">
-                                    <label for="contactoVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-id-card text-primary me-1"></i> Contacto y Teléfono:
+                                    <label
+                                        for="contactoVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-id-card text-primary me-1"
+                                        ></i> Contacto y Teléfono:
                                     </label>
                                     <input
                                         id="contactoVisita"
@@ -915,14 +1050,20 @@
                                         bind:value={form.contacto}
                                     />
                                     <div class="form-text fs-8 text-muted">
-                                        {form.telefono || 'Contacto clave en empresa'}
+                                        {form.telefono ||
+                                            "Contacto clave en empresa"}
                                     </div>
                                 </div>
 
                                 <!-- 8. OBJETIVO / MOTIVO -->
                                 <div class="col-12">
-                                    <label for="objetivoVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-bullseye text-primary me-1"></i> Objetivo / Motivo de la Visita:
+                                    <label
+                                        for="objetivoVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-bullseye text-primary me-1"
+                                        ></i> Objetivo / Motivo de la Visita:
                                     </label>
                                     <input
                                         id="objetivoVisita"
@@ -935,22 +1076,28 @@
 
                                 <!-- 9. OBSERVACIONES / NOTAS -->
                                 <div class="col-12">
-                                    <label for="notasVisita" class="form-label fw-semibold text-dark fs-7">
-                                        <i class="fa fa-note-sticky text-primary me-1"></i> Observaciones / Notas para el vendedor:
+                                    <label
+                                        for="notasVisita"
+                                        class="form-label fw-semibold text-dark fs-7"
+                                    >
+                                        <i
+                                            class="fa fa-note-sticky text-primary me-1"
+                                        ></i> Observaciones / Notas para el vendedor:
                                     </label>
                                     <textarea
                                         id="notasVisita"
                                         class="form-control shadow-xs fs-7"
                                         rows="2"
                                         placeholder="Detalles adicionales, recordatorios, antecedentes relevantes..."
-                                        bind:value={form.notas}
-                                    ></textarea>
+                                        bind:value={form.notas}></textarea>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Modal Footer -->
-                        <div class="modal-footer bg-white border-top py-2.5 px-4 d-flex justify-content-between align-items-center">
+                        <div
+                            class="modal-footer bg-white border-top py-2.5 px-4 d-flex justify-content-between align-items-center"
+                        >
                             <button
                                 type="button"
                                 class="btn btn-outline-secondary btn-sm px-3"
@@ -963,8 +1110,16 @@
                                 type="submit"
                                 class="btn btn-primary btn-sm px-4 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
                             >
-                                <i class="fa {isEditing ? 'fa-check' : 'fa-calendar-plus'}"></i>
-                                <span>{isEditing ? "Guardar Cambios" : "Programar Visita"}</span>
+                                <i
+                                    class="fa {isEditing
+                                        ? 'fa-check'
+                                        : 'fa-calendar-plus'}"
+                                ></i>
+                                <span
+                                    >{isEditing
+                                        ? "Guardar Cambios"
+                                        : "Programar Visita"}</span
+                                >
                             </button>
                         </div>
                     </form>
@@ -1020,7 +1175,10 @@
 
                 <!-- Filtro por Tipo -->
                 <div class="col-6 col-md-2 col-xl-2">
-                    <select class="form-select form-select-sm" bind:value={filterTipo}>
+                    <select
+                        class="form-select form-select-sm"
+                        bind:value={filterTipo}
+                    >
                         <option value="ALL">Todos los Tipos</option>
                         <option value="CRM_CUSTOMER">Clientes CRM</option>
                         <option value="PROSPECT">Prospectos</option>
@@ -1029,7 +1187,10 @@
 
                 <!-- Filtro por Estado -->
                 <div class="col-6 col-md-3 col-xl-2">
-                    <select class="form-select form-select-sm" bind:value={filterStatus}>
+                    <select
+                        class="form-select form-select-sm"
+                        bind:value={filterStatus}
+                    >
                         <option value="ALL">Todos los Estados</option>
                         <option value="PROGRAMADA">Programadas</option>
                         <option value="REALIZADA">Realizadas</option>
@@ -1041,12 +1202,20 @@
                 <div class="col-6 col-md-12 col-xl-2 text-md-end">
                     <button
                         class="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1.5"
-                        on:click={() => (sortDirection = sortDirection === "asc" ? "desc" : "asc")}
+                        on:click={() =>
+                            (sortDirection =
+                                sortDirection === "asc" ? "desc" : "asc")}
                         title="Cambiar orden por fecha"
                     >
-                        <i class="fa {sortDirection === 'asc' ? 'fa-arrow-down-short-wide' : 'fa-arrow-up-wide-short'} text-primary"></i>
+                        <i
+                            class="fa {sortDirection === 'asc'
+                                ? 'fa-arrow-down-short-wide'
+                                : 'fa-arrow-up-wide-short'} text-primary"
+                        ></i>
                         <span class="fs-8">
-                            {sortDirection === 'asc' ? 'Fecha más próxima' : 'Fecha más lejana'}
+                            {sortDirection === "asc"
+                                ? "Fecha más próxima"
+                                : "Fecha más lejana"}
                         </span>
                     </button>
                 </div>
@@ -1058,8 +1227,11 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <div class="d-flex align-items-center gap-2">
             <h5 class="fw-bold text-gray-800 mb-0">Visitas del Programa</h5>
-            <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2.5">
-                {sortedVisits.length} {sortedVisits.length === 1 ? 'visita' : 'visitas'}
+            <span
+                class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2.5"
+            >
+                {sortedVisits.length}
+                {sortedVisits.length === 1 ? "visita" : "visitas"}
             </span>
         </div>
 
@@ -1076,12 +1248,16 @@
                 <div class="empty-state-icon mb-3 text-muted">
                     <i class="fa fa-calendar-xmark fa-3x"></i>
                 </div>
-                <h5 class="fw-bold text-dark">No se encontraron visitas programadas</h5>
+                <h5 class="fw-bold text-dark">
+                    No se encontraron visitas programadas
+                </h5>
                 <p class="text-secondary small mb-3">
                     {#if searchTerm || filterVendedor !== "ALL" || filterTipo !== "ALL" || filterStatus !== "ALL"}
-                        No hay resultados que coincidan con los filtros seleccionados.
+                        No hay resultados que coincidan con los filtros
+                        seleccionados.
                     {:else}
-                        Comienza programando una nueva visita con el botón superior.
+                        Comienza programando una nueva visita con el botón
+                        superior.
                     {/if}
                 </p>
                 {#if searchTerm || filterVendedor !== "ALL" || filterTipo !== "ALL" || filterStatus !== "ALL"}
@@ -1111,46 +1287,79 @@
         <div class="row g-3">
             {#each sortedVisits as visit (visit.id)}
                 <div class="col-12 col-md-6 col-xl-4">
-                    <div class="card h-100 visit-card shadow-sm border-0 {visit.status === 'REALIZADA' ? 'status-realizada' : visit.status === 'CANCELADA' ? 'status-cancelada' : 'status-programada'}">
+                    <div
+                        class="card h-100 visit-card shadow-sm border-0 {visit.status ===
+                        'REALIZADA'
+                            ? 'status-realizada'
+                            : visit.status === 'CANCELADA'
+                              ? 'status-cancelada'
+                              : 'status-programada'}"
+                    >
                         <!-- Header de la tarjeta -->
-                        <div class="card-header bg-white border-bottom-0 pt-3 px-3 pb-1">
+                        <div
+                            class="card-header bg-white border-bottom-0 pt-3 px-3 pb-1"
+                        >
                             <!-- Primera línea: Fecha y Hora programada -->
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="badge date-badge px-2.5 py-1.5 fs-7 fw-bold d-inline-flex align-items-center gap-1.5">
+                                <span
+                                    class="badge date-badge px-2.5 py-1.5 fs-7 fw-bold d-inline-flex align-items-center gap-1.5"
+                                >
                                     <i class="fa fa-calendar-day"></i>
                                     {dayjs(visit.fecha).format("DD/MM/YYYY")}
                                 </span>
-                                <span class="badge time-badge px-2.5 py-1.5 fs-7 fw-semibold d-inline-flex align-items-center gap-1.5">
+                                <span
+                                    class="badge time-badge px-2.5 py-1.5 fs-7 fw-semibold d-inline-flex align-items-center gap-1.5"
+                                >
                                     <i class="fa fa-clock"></i>
                                     {visit.hora} hrs
                                 </span>
                             </div>
 
                             <!-- Segunda línea: Tercer valor (Estado corregido y con alta legibilidad) y Tipo -->
-                            <div class="d-flex align-items-center justify-content-between pb-2 border-bottom border-light-subtle">
-                                <div class="d-inline-flex align-items-center gap-1.5">
-                                    <span class="fs-8 text-muted fw-semibold">Estado:</span>
-                                    {#if visit.status === 'REALIZADA'}
-                                        <span class="badge status-badge-realizada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1">
+                            <div
+                                class="d-flex align-items-center justify-content-between pb-2 border-bottom border-light-subtle"
+                            >
+                                <div
+                                    class="d-inline-flex align-items-center gap-1.5"
+                                >
+                                    <span class="fs-8 text-muted fw-semibold"
+                                        >Estado:</span
+                                    >
+                                    {#if visit.status === "REALIZADA"}
+                                        <span
+                                            class="badge status-badge-realizada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1"
+                                        >
                                             <i class="fa fa-circle-check"></i> Realizada
                                         </span>
-                                    {:else if visit.status === 'CANCELADA'}
-                                        <span class="badge status-badge-cancelada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1">
+                                    {:else if visit.status === "CANCELADA"}
+                                        <span
+                                            class="badge status-badge-cancelada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1"
+                                        >
                                             <i class="fa fa-ban"></i> Cancelada
                                         </span>
                                     {:else}
-                                        <span class="badge status-badge-programada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1">
-                                            <i class="fa fa-hourglass-half"></i> Programada
+                                        <span
+                                            class="badge status-badge-programada px-2.5 py-1 fs-8 fw-bold d-inline-flex align-items-center gap-1"
+                                        >
+                                            <i class="fa fa-hourglass-half"></i>
+                                            Programada
                                         </span>
                                     {/if}
                                 </div>
 
-                                {#if visit.tipo === 'CRM_CUSTOMER'}
-                                    <span class="badge bg-primary text-white border px-2 py-1 fs-8 fw-semibold flex-shrink-0" title="Cliente del CRM">
-                                        <i class="fa fa-shield-halved me-1"></i> CRM
+                                {#if visit.tipo === "CRM_CUSTOMER"}
+                                    <span
+                                        class="badge bg-primary text-white border px-2 py-1 fs-8 fw-semibold flex-shrink-0"
+                                        title="Cliente del CRM"
+                                    >
+                                        <i class="fa fa-shield-halved me-1"></i>
+                                        CRM
                                     </span>
                                 {:else}
-                                    <span class="badge bg-warning text-dark border px-2 py-1 fs-8 fw-semibold flex-shrink-0" title="Prospecto en prospección">
+                                    <span
+                                        class="badge bg-warning text-dark border px-2 py-1 fs-8 fw-semibold flex-shrink-0"
+                                        title="Prospecto en prospección"
+                                    >
                                         <i class="fa fa-bullseye me-1"></i> Prospecto
                                     </span>
                                 {/if}
@@ -1161,38 +1370,69 @@
                         <div class="card-body px-3 py-2">
                             <!-- Nombre del Cliente -->
                             <div class="mb-2">
-                                <h6 class="fw-bold text-dark mb-0 fs-6 text-truncate" title={visit.clienteName}>
-                                    <i class="fa fa-building text-secondary me-1"></i>
+                                <h6
+                                    class="fw-bold text-dark mb-0 fs-6 text-truncate"
+                                    title={visit.clienteName}
+                                >
+                                    <i
+                                        class="fa fa-building text-secondary me-1"
+                                    ></i>
                                     {visit.clienteName}
                                 </h6>
                             </div>
 
                             <!-- Vendedor asignado -->
-                            <div class="vendedor-pill d-flex align-items-center gap-2 p-2 rounded-2 mb-2">
-                                <div class="avatar-circle-sm bg-primary text-white">
+                            <div
+                                class="vendedor-pill d-flex align-items-center gap-2 p-2 rounded-2 mb-2"
+                            >
+                                <div
+                                    class="avatar-circle-sm bg-primary text-white"
+                                >
                                     {visit.vendedorName.charAt(0)}
                                 </div>
                                 <div class="overflow-hidden">
-                                    <div class="fs-8 text-muted text-uppercase fw-semibold line-height-1">Vendedor</div>
-                                    <div class="fs-7 fw-bold text-gray-900 text-truncate">{visit.vendedorName}</div>
+                                    <div
+                                        class="fs-8 text-muted text-uppercase fw-semibold line-height-1"
+                                    >
+                                        Vendedor
+                                    </div>
+                                    <div
+                                        class="fs-7 fw-bold text-gray-900 text-truncate"
+                                    >
+                                        {visit.vendedorName}
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Dirección y Contacto -->
                             {#if visit.direccion}
-                                <div class="text-secondary fs-8 mb-1 d-flex align-items-start gap-1.5">
-                                    <i class="fa fa-location-dot text-danger mt-1 flex-shrink-0"></i>
-                                    <span class="text-truncate-2" title={visit.direccion}>{visit.direccion}</span>
+                                <div
+                                    class="text-secondary fs-8 mb-1 d-flex align-items-start gap-1.5"
+                                >
+                                    <i
+                                        class="fa fa-location-dot text-danger mt-1 flex-shrink-0"
+                                    ></i>
+                                    <span
+                                        class="text-truncate-2"
+                                        title={visit.direccion}
+                                        >{visit.direccion}</span
+                                    >
                                 </div>
                             {/if}
 
                             {#if visit.contacto || visit.telefono}
-                                <div class="text-secondary fs-8 mb-2 d-flex align-items-center gap-1.5">
-                                    <i class="fa fa-user text-muted flex-shrink-0"></i>
+                                <div
+                                    class="text-secondary fs-8 mb-2 d-flex align-items-center gap-1.5"
+                                >
+                                    <i
+                                        class="fa fa-user text-muted flex-shrink-0"
+                                    ></i>
                                     <span class="text-truncate">
-                                        {visit.contacto || ''}
+                                        {visit.contacto || ""}
                                         {#if visit.telefono}
-                                            <span class="text-muted ms-1">({visit.telefono})</span>
+                                            <span class="text-muted ms-1"
+                                                >({visit.telefono})</span
+                                            >
                                         {/if}
                                     </span>
                                 </div>
@@ -1200,9 +1440,18 @@
 
                             <!-- Objetivo / Observaciones -->
                             {#if visit.objetivo}
-                                <div class="objetivo-box p-2 rounded-2 bg-light border-start border-3 border-primary mb-2">
-                                    <div class="fs-8 fw-bold text-muted text-uppercase mb-0.5">Objetivo</div>
-                                    <div class="fs-8 text-dark text-truncate-2" title={visit.objetivo}>
+                                <div
+                                    class="objetivo-box p-2 rounded-2 bg-light border-start border-3 border-primary mb-2"
+                                >
+                                    <div
+                                        class="fs-8 fw-bold text-muted text-uppercase mb-0.5"
+                                    >
+                                        Objetivo
+                                    </div>
+                                    <div
+                                        class="fs-8 text-dark text-truncate-2"
+                                        title={visit.objetivo}
+                                    >
                                         {visit.objetivo}
                                     </div>
                                 </div>
@@ -1210,28 +1459,41 @@
 
                             {#if visit.notas}
                                 <div class="fs-8 text-muted fst-italic mb-2">
-                                    <i class="fa fa-note-sticky me-1 text-warning"></i> {visit.notas}
+                                    <i
+                                        class="fa fa-note-sticky me-1 text-warning"
+                                    ></i>
+                                    {visit.notas}
                                 </div>
                             {/if}
                         </div>
 
                         <!-- Footer con acciones -->
-                        <div class="card-footer bg-white border-top px-3 py-2 d-flex align-items-center justify-content-between">
+                        <div
+                            class="card-footer bg-white border-top px-3 py-2 d-flex align-items-center justify-content-between"
+                        >
                             <!-- Botón de estado rápido -->
                             <div>
-                                {#if visit.status === 'PROGRAMADA'}
+                                {#if visit.status === "PROGRAMADA"}
                                     <button
                                         class="btn btn-xs btn-outline-success d-inline-flex align-items-center gap-1"
-                                        on:click={() => handleToggleStatus(visit, "REALIZADA")}
+                                        on:click={() =>
+                                            handleToggleStatus(
+                                                visit,
+                                                "REALIZADA",
+                                            )}
                                         title="Marcar visita como completada"
                                     >
                                         <i class="fa fa-check"></i>
                                         <span>Completar</span>
                                     </button>
-                                {:else if visit.status === 'REALIZADA'}
+                                {:else if visit.status === "REALIZADA"}
                                     <button
                                         class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center gap-1"
-                                        on:click={() => handleToggleStatus(visit, "PROGRAMADA")}
+                                        on:click={() =>
+                                            handleToggleStatus(
+                                                visit,
+                                                "PROGRAMADA",
+                                            )}
                                         title="Reabrir como programada"
                                     >
                                         <i class="fa fa-rotate-left"></i>
@@ -1240,7 +1502,11 @@
                                 {:else}
                                     <button
                                         class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1"
-                                        on:click={() => handleToggleStatus(visit, "PROGRAMADA")}
+                                        on:click={() =>
+                                            handleToggleStatus(
+                                                visit,
+                                                "PROGRAMADA",
+                                            )}
                                     >
                                         <i class="fa fa-rotate-left"></i>
                                         <span>Reactivar</span>
@@ -1309,7 +1575,9 @@
 
     /* Tarjetas de Métricas */
     .metric-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
         background: #ffffff;
     }
     .metric-card:hover {
@@ -1392,13 +1660,13 @@
     /* Badges de fecha y hora */
     .date-badge {
         background-color: #eff6ff;
-        color: #1d4ed8;
+        color: #52555a;
         border: 1px solid #bfdbfe;
     }
 
     .time-badge {
         background-color: #f1f5f9;
-        color: #334155;
+        color: #52555a;
         border: 1px solid #e2e8f0;
     }
 

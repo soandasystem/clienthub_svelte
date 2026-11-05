@@ -1,0 +1,28 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clienthub_frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      # Las variables VITE_* se inyectan en build time desde el .env
+      # Si necesitás sobreescribirlas en runtime, usá un entrypoint script
+      - NODE_ENV=production
+
+  # ─── Descomentá este bloque si tu backend también corre en Docker ──────────
+  # backend:
+  #   image: tu-imagen-backend:latest   # o build: { context: ../clienthub_go }
+  #   container_name: clienthub_backend
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - .env.backend
+  #   restart: unless-stopped
+
+networks:
+  default:
+    name: clienthub_network
+

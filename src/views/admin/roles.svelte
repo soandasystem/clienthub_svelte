@@ -80,11 +80,13 @@
                 <i class="fa fa-pencil"></i>
             </button>`;
         }
+        /*
         if (isDelete) {
             acciones += `<button class="btn-mini-custom delete" onclick="document.dispatchEvent(new CustomEvent('delete-role', {detail: ${r.id}}))" title="Eliminar">
                 <i class="fa fa-trash"></i>
             </button>`;
         }
+            */
         acciones += `</div>`;
         return [
             r.description || "",
@@ -310,11 +312,13 @@
                         Administra los roles y sus permisos de los usuarios.
                     </p>
                 </div>
+                <!---
                 {#if hasPermissionPrograms(rol, "roles", "INSERT")}
                     <button class="btn-new" on:click={openCreateForm}>
                         <i class="fa fa-plus"></i> Nuevo Rol
                     </button>
                 {/if}
+                -->
             </div>
             <div class="table-container p-3 pt-0">
                 {#key dtData}

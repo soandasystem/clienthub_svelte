@@ -24,6 +24,12 @@
             )
         ) {
             openSubmenu = "config";
+        } else if (
+            [`${baseUrl}/visit`, `${baseUrl}/prospect`].some(
+                (path) => activePath.startsWith(path),
+            )
+        ) {
+            openSubmenu = "comercial";
         } else {
             openSubmenu = "";
         }
@@ -31,6 +37,10 @@
 
     const toggleConfig = () => {
         openSubmenu = openSubmenu === "config" ? "" : "config";
+    };
+
+    const toggleComercial = () => {
+        openSubmenu = openSubmenu === "comercial" ? "" : "comercial";
     };
 </script>
 
@@ -63,7 +73,7 @@
         <ul id="main-menu" class="main-menu">
             <li class="menu-divider">Administración</li>
 
-            {#if hasPermission(rol, "company") || hasPermission(rol, "roles") || hasPermission(rol, "users")}
+            {#if hasPermission(rol, "company") || hasPermission(rol, "roles") || hasPermission(rol, "users") || hasPermission(rol, "visits")}
                 <li
                     class="has-sub {openSubmenu === 'config'
                         ? 'active opened'
@@ -126,13 +136,55 @@
                 </li>
             {/if}
 
-            <li class="menu-divider">Gestión Comercial</li>
-            <li class={activePath.startsWith(`${baseUrl}/visit`) ? "active" : ""}>
-                <a href="{baseUrl}/visit" use:link>
-                    <i class="fa fa-calendar-check"></i>
-                    <span class="title">Programa de Visitas</span>
-                </a>
-            </li>
+            {#if hasPermission(rol, "visit") || hasPermission(rol, "prospect")}
+                <li class="menu-divider">Gestión Comercial</li>
+
+                <li
+                    class="has-sub {openSubmenu === 'comercial'
+                        ? 'active opened'
+                        : ''}"
+                >
+                    <a href="#!" on:click|preventDefault={toggleComercial}>
+                        <i class="fa fa-fw fa-briefcase"></i>
+                        <span class="title">Gestión Comercial</span>
+                        <i class="fa fa-chevron-right chevron"></i>
+                    </a>
+
+                    {#if openSubmenu === "comercial"}
+                        <ul class="sub-menu">
+                            {#if hasPermission(rol, "visit")}
+                                <li
+                                    class={activePath.startsWith(
+                                        `${baseUrl}/visit`,
+                                    )
+                                        ? "active"
+                                        : ""}
+                                >
+                                    <a href="{baseUrl}/visit" use:link>
+                                        <i class="fa fa-calendar-check"></i>
+                                        <span class="title">Programa de Visitas</span>
+                                    </a>
+                                </li>
+                            {/if}
+
+                            {#if hasPermission(rol, "prospect")}
+                                <li
+                                    class={activePath.startsWith(
+                                        `${baseUrl}/prospect`,
+                                    )
+                                        ? "active"
+                                        : ""}
+                                >
+                                    <a href="{baseUrl}/prospect" use:link>
+                                        <i class="fa fa-user-plus"></i>
+                                        <span class="title">Prospectos</span>
+                                    </a>
+                                </li>
+                            {/if}
+                        </ul>
+                    {/if}
+                </li>
+            {/if}
         </ul>
     </div>
 </div>

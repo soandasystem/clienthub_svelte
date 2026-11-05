@@ -457,9 +457,11 @@
                         Administra las empresas y clientes del sistema.
                     </p>
                 </div>
+                <!--
                 <button class="btn-new" on:click={openCreateForm}>
                     <i class="fa fa-plus"></i> Nueva Empresa
                 </button>
+                -->
             </div>
             <div class="table-container p-3 pt-0">
                 {#key dtData}
