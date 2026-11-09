@@ -5,165 +5,17 @@
     import { secureStorage } from "../../lib/secureStore";
     import { tenantStore } from "../../stores/tenant";
     import api from "../../lib/apis.js";
+    import Company from "./company.svelte";
 
     // Información de sesión / usuario
     const userData = secureStorage.getItem("_us_") || {};
     const schemaName = userData?.schema || "salesvisit";
     const author = userData?.username || userData?.name || "Supervisor";
 
-    // Vendedores predefinidos con sus carteras de clientes (Clientes CRM y Prospectos)
-    const vendedoresData = [
-        {
-            id: "vend_1",
-            name: "Carlos Pérez",
-            email: "carlos.perez@clienthub.cl",
-            phone: "+56 9 9123 4567",
-            zone: "Santiago - Región Metropolitana",
-            clients: [
-                {
-                    id: "cli_101",
-                    name: "Comercial ABC",
-                    type: "CRM_CUSTOMER",
-                    address: "Av. Providencia 1234, Of. 602, Providencia",
-                    contact: "Mariana Silva",
-                    phone: "+56 9 8765 4321",
-                    email: "compras@comercialabc.cl",
-                    city: "Santiago",
-                },
-                {
-                    id: "cli_102",
-                    name: "Distribuidora Norte Ltda.",
-                    type: "CRM_CUSTOMER",
-                    address: "Panamericana Norte 4500, Conchalí",
-                    contact: "Pedro Rojas",
-                    phone: "+56 9 7654 3210",
-                    email: "pedro.rojas@distribuidoranorte.cl",
-                    city: "Santiago",
-                },
-                {
-                    id: "cli_103",
-                    name: "Innova Tech SpA",
-                    type: "PROSPECT",
-                    address: "Av. Las Condes 890, Las Condes",
-                    contact: "Felipe Soto",
-                    phone: "+56 9 6543 2109",
-                    email: "contacto@innovatech.cl",
-                    city: "Santiago",
-                },
-                {
-                    id: "cli_104",
-                    name: "Constructora Los Andes",
-                    type: "PROSPECT",
-                    address: "Av. San Martín 560, Rancagua",
-                    contact: "Rodrigo Morales",
-                    phone: "+56 9 5432 1098",
-                    email: "rmorales@losandescorp.cl",
-                    city: "Rancagua",
-                },
-            ],
-        },
-        {
-            id: "vend_2",
-            name: "María González",
-            email: "maria.gonzalez@clienthub.cl",
-            phone: "+56 9 8234 5678",
-            zone: "Valparaíso y Costa Central",
-            clients: [
-                {
-                    id: "cli_201",
-                    name: "Farmacias Vida Salud",
-                    type: "CRM_CUSTOMER",
-                    address: "Av. Libertador B. O'Higgins 2030, Santiago",
-                    contact: "Loreto Barraza",
-                    phone: "+56 9 4321 0987",
-                    email: "loreto@vidasalud.cl",
-                    city: "Santiago",
-                },
-                {
-                    id: "cli_202",
-                    name: "Alimentos del Sur",
-                    type: "CRM_CUSTOMER",
-                    address: "Calle Cochrane 412, Concepción",
-                    contact: "Gustavo Valenzuela",
-                    phone: "+56 9 3210 9876",
-                    email: "gvalenzuela@alimentossur.cl",
-                    city: "Concepción",
-                },
-                {
-                    id: "cli_203",
-                    name: "Logística Global SA",
-                    type: "PROSPECT",
-                    address: "Camino Lonquén 1200, Maipú",
-                    contact: "Carla Pizarro",
-                    phone: "+56 9 2109 8765",
-                    email: "cpizarro@logisticaglobal.cl",
-                    city: "Santiago",
-                },
-            ],
-        },
-        {
-            id: "vend_3",
-            name: "Juan Soto",
-            email: "juan.soto@clienthub.cl",
-            phone: "+56 9 7345 6789",
-            zone: "Zona Centro y Costa",
-            clients: [
-                {
-                    id: "cli_301",
-                    name: "Supermercados Central",
-                    type: "CRM_CUSTOMER",
-                    address: "Av. Valparaíso 345, Viña del Mar",
-                    contact: "Ignacio Herrera",
-                    phone: "+56 9 1098 7654",
-                    email: "compras@supercentral.cl",
-                    city: "Viña del Mar",
-                },
-                {
-                    id: "cli_302",
-                    name: "Ferretería Industrial El Roble",
-                    type: "PROSPECT",
-                    address: "Av. Bernardo O'Higgins 780, Talca",
-                    contact: "Jorge Castillo",
-                    phone: "+56 9 0987 6543",
-                    email: "ventas@elroble.cl",
-                    city: "Talca",
-                },
-            ],
-        },
-        {
-            id: "vend_4",
-            name: "Andrea Castro",
-            email: "andrea.castro@clienthub.cl",
-            phone: "+56 9 6456 7890",
-            zone: "Zona Sur",
-            clients: [
-                {
-                    id: "cli_401",
-                    name: "Clínica San Cristóbal",
-                    type: "CRM_CUSTOMER",
-                    address: "Av. Vitacura 5100, Vitacura",
-                    contact: "Dra. Marcela Lagos",
-                    phone: "+56 9 9876 5432",
-                    email: "abastecimiento@clinicasancristobal.cl",
-                    city: "Santiago",
-                },
-                {
-                    id: "cli_402",
-                    name: "Hotel Boutique Cordillera",
-                    type: "PROSPECT",
-                    address: "Costanera 210, Puerto Varas",
-                    contact: "Sebastián Fuentes",
-                    phone: "+56 9 8765 1234",
-                    email: "gerencia@hotelcordillera.cl",
-                    city: "Puerto Varas",
-                },
-            ],
-        },
-    ];
-
-    let vendedores = [...vendedoresData];
-
+    var vendedores = [];
+    var visits = [];
     // Visitas iniciales de muestra con la visita requerida por el usuario
+    /*
     const initialVisits = [
         {
             id: "vis_1",
@@ -245,7 +97,7 @@
     // Estado de las visitas
     let visits = [];
     const STORAGE_KEY = "clienthub_scheduled_visits";
-
+    */
     // Estado del formulario
     const getInitialForm = () => ({
         vendedorId: "vend_1", // Default: Carlos Pérez para conveniencia inmediata
@@ -324,26 +176,22 @@
 
     // Cargar datos persistidos o iniciales
     onMount(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                visits = JSON.parse(saved);
-            } else {
-                visits = [...initialVisits];
-                saveToLocalStorage(visits);
-            }
-        } catch (e) {
-            console.error("Error al cargar visitas:", e);
-            visits = [...initialVisits];
-        }
-
+        //          visits = [...initialVisits];
         // Cargar vendedores desde API si está disponible
         fetchApiUsers();
+        // Cargar visitas desde API si está disponible
+        fetchApiVisit();
     });
 
     const fetchApiUsers = async () => {
         try {
-            const resp = await api.getData("users", "", "", "", schemaName);
+            const resp = await api.getData(
+                "users/informe",
+                "",
+                "roles_id=3&company_id=" + Company,
+                "",
+                schemaName,
+            );
             if (
                 resp &&
                 resp.status === "success" &&
@@ -355,18 +203,47 @@
                     "[Visit] Usuarios cargados desde API:",
                     resp.data.length,
                 );
+                vendedores = [...resp.data];
             }
         } catch (err) {
             console.warn("[Visit] Usando lista de vendedores configurada");
         }
     };
+    const fetchApiVisit = async () => {
+        try {
+            const resp = await api.getData(
+                "visit/informe",
+                "",
+                "company_id=" + Company,
+                "",
+                schemaName,
+            );
+            if (
+                resp &&
+                resp.status === "success" &&
+                Array.isArray(resp.data) &&
+                resp.data.length > 0
+            ) {
+                // Si la API tiene usuarios, combinamos los nombres manteniendo la estructura de clientes
+                console.log(
+                    "[Visit] Visitas cargadas desde API:",
+                    resp.data.length,
+                );
+                visits = [...resp.data];
+            }
+        } catch (err) {
+            console.warn("[Visit] Usando lista de visitas configurada");
+        }
+    };
 
     function saveToLocalStorage(data) {
+        /*
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         } catch (e) {
             console.error("Error al guardar en localStorage:", e);
         }
+            */
     }
 
     // Guardar / Programar visita
@@ -484,7 +361,7 @@
         const v = vendedores.find((item) => item.id === currentVendId);
         if (v && v.clients.length > 0) {
             form.clienteId = v.clients[0].id;
-            form.clienteName = v.clients[0].name;
+            form.clienteName = v.clients[0].full_name;
             form.tipo = v.clients[0].type;
             form.direccion = v.clients[0].address || "";
             form.contacto = v.clients[0].contact || "";
@@ -853,7 +730,7 @@
                                         >
                                         {#each vendedores as vend}
                                             <option value={vend.id}>
-                                                {vend.name} ({vend.clients
+                                                {vend.full_name} ({vend.clients
                                                     .length} clientes)
                                             </option>
                                         {/each}
@@ -1167,7 +1044,8 @@
                         <select class="form-select" bind:value={filterVendedor}>
                             <option value="ALL">Todos los Vendedores</option>
                             {#each vendedores as vend}
-                                <option value={vend.id}>{vend.name}</option>
+                                <option value={vend.id}>{vend.full_name}</option
+                                >
                             {/each}
                         </select>
                     </div>
