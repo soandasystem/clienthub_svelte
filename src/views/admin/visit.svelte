@@ -105,7 +105,7 @@
             const resp = await api.getData(
                 "users/informe",
                 "",
-                "roles_id=3&company_id=" + Company,
+                `roles_id=3&company_id=${Company}`,
                 "",
                 schemaName,
             );
@@ -131,7 +131,7 @@
             const resp = await api.getData(
                 "visit/informe",
                 "",
-                "company_id=" + Company,
+                `company_id=${Company}`,
                 "",
                 schemaName,
             );
@@ -141,12 +141,31 @@
                 Array.isArray(resp.data) &&
                 resp.data.length > 0
             ) {
-                // Si la API tiene usuarios, combinamos los nombres manteniendo la estructura de clientes
                 console.log(
                     "[Visit] Visitas cargadas desde API:",
                     resp.data.length,
                 );
-                visits = [...resp.data];
+                // Normalizar la respuesta de la API al shape interno usado por filtros,
+                // tarjetas y el formulario de edición.
+                visits = resp.data.map((v) => ({
+                    id:           v.id,
+                    vendedorId:   v.seller_id,
+                    vendedorName: v.users?.fullname   ?? "",
+                    clienteId:    v.customer_id,
+                    clienteName:  v.customers?.company_name ?? "",
+                    tipo:         v.type,
+                    // scheduled_at viene como ISO datetime → separar fecha y hora
+                    fecha:        v.scheduled_at ? dayjs(v.scheduled_at).format("YYYY-MM-DD") : "",
+                    hora:         v.scheduled_at ? dayjs(v.scheduled_at).format("HH:mm")      : "",
+                    direccion:    v.customers?.address        ?? "",
+                    contacto:     v.customers?.contact_person ?? "",
+                    telefono:     v.customers?.phone          ?? "",
+                    objetivo:     v.objetive ?? "",
+                    notas:        v.notas    ?? "",
+                    status:       v.status   ?? "PROGRAMADA",
+                    createdBy:    v.created_by ?? "",
+                    createdAt:    v.created_at ?? "",
+                }));
             }
         } catch (err) {
             console.warn("[Visit] Usando lista de visitas configurada");
@@ -213,8 +232,6 @@
                 }
                 return v;
             });
-
-            saveToLocalStorage(visits);
 
             Swal.fire({
                 icon: "success",
@@ -303,21 +320,23 @@
 
     // Cargar visita en el formulario para edición y abrir modal
     function handleEditVisit(visit) {
+        console.log(visit);
         isEditing = true;
         editingId = visit.id;
         form = {
-            vendedorId: visit.vendedorId,
-            vendedorName: visit.vendedorName,
-            clienteId: visit.clienteId,
-            clienteName: visit.clienteName,
-            tipo: visit.tipo,
-            fecha: visit.fecha,
-            hora: visit.hora,
-            direccion: visit.direccion || "",
-            contacto: visit.contacto || "",
-            telefono: visit.telefono || "",
-            objetivo: visit.objetivo || "",
-            notas: visit.notas || "",
+            vendedorId:   visit.vendedorId   ?? visit.seller_id,
+            vendedorName: visit.vendedorName ?? visit.users?.fullname ?? "",
+            clienteId:    visit.clienteId    ?? visit.customer_id,
+            clienteName:  visit.clienteName  ?? visit.customers?.company_name ?? "",
+            tipo:         visit.tipo         ?? visit.type,
+            // Si viene el campo ya separado lo usa; si no, parte el timestamp ISO
+            fecha: visit.fecha || (visit.scheduled_at ? dayjs(visit.scheduled_at).format("YYYY-MM-DD") : ""),
+            hora:  visit.hora  || (visit.scheduled_at ? dayjs(visit.scheduled_at).format("HH:mm")      : ""),
+            direccion: visit.direccion ?? visit.customers?.address        ?? "",
+            contacto:  visit.contacto  ?? visit.customers?.contact_person ?? "",
+            telefono:  visit.telefono  ?? visit.customers?.phone          ?? "",
+            objetivo:  visit.objetivo  ?? visit.objetive ?? "",
+            notas:     visit.notas     ?? "",
         };
 
         showModal = true;
@@ -1183,7 +1202,7 @@
                                 <div
                                     class="avatar-circle-sm bg-primary text-white"
                                 >
-                                    {visit.vendedorName.charAt(0)}
+                                    {visit.vendedorName}
                                 </div>
                                 <div class="overflow-hidden">
                                     <div
