@@ -5,15 +5,15 @@
     import { secureStorage } from "../../lib/secureStore";
     import { tenantStore } from "../../stores/tenant";
     import api from "../../lib/apis.js";
-    import Company from "./company.svelte";
 
     // Información de sesión / usuario
     const userData = secureStorage.getItem("_us_") || {};
     const schemaName = userData?.schema || "salesvisit";
     const author = userData?.username || userData?.name || "Supervisor";
+    const company_id = userData?.company;
 
-    var vendedores = [];
-    var visits = [];
+    let vendedores = [];
+    let visits = [];
 
     // Estado del formulario
     const getInitialForm = () => ({
@@ -45,23 +45,26 @@
     let sortDirection = "asc"; // 'asc' = fecha más próxima primero
 
     // Clientes disponibles según el vendedor seleccionado en el formulario
-    $: selectedVendedor = vendedores.find((v) => v.id === form.vendedorId);
-    $: availableClients = selectedVendedor ? selectedVendedor.clients : [];
+    $: selectedVendedor = vendedores.find(
+        (v) => String(v.id) === String(form.vendedorId),
+    );
+    $: availableClients = selectedVendedor?.clients || [];
 
     // Manejar cambio de vendedor en el formulario
     function handleVendedorChange(event) {
         const vendId = event.target.value;
         form.vendedorId = vendId;
-        const vend = vendedores.find((v) => v.id === vendId);
+        const vend = vendedores.find((v) => String(v.id) === String(vendId));
 
         if (vend) {
-            form.vendedorName = vend.name;
+            form.vendedorName = vend.full_name || vend.name;
             // Seleccionar automáticamente el primer cliente si existe
-            if (vend.clients.length > 0) {
+            if (vend.clients && vend.clients.length > 0) {
                 const firstClient = vend.clients[0];
                 form.clienteId = firstClient.id;
                 form.clienteName = firstClient.name;
-                form.tipo = firstClient.type;
+                form.tipo =
+                    firstClient.customer || firstClient.consumer_type_type;
                 form.direccion = firstClient.address || "";
                 form.contacto = firstClient.contact || "";
                 form.telefono = firstClient.phone || "";
@@ -84,7 +87,7 @@
 
         if (cli) {
             form.clienteName = cli.name;
-            form.tipo = cli.type; // Se sincroniza automáticamente el tipo (CRM_CUSTOMER o PROSPECT)
+            form.tipo = cli.costumer_type; // Se sincroniza automáticamente el tipo (CRM_CUSTOMER o PROSPECT)
             form.direccion = cli.address || "";
             form.contacto = cli.contact || "";
             form.telefono = cli.phone || "";
@@ -105,7 +108,7 @@
             const resp = await api.getData(
                 "users/informe",
                 "",
-                `roles_id=3&company_id=${Company}`,
+                `roles_id=3&company_id=${company_id}`,
                 "",
                 schemaName,
             );
@@ -115,15 +118,22 @@
                 Array.isArray(resp.data) &&
                 resp.data.length > 0
             ) {
-                // Si la API tiene usuarios, combinamos los nombres manteniendo la estructura de clientes
                 console.log(
                     "[Visit] Usuarios cargados desde API:",
                     resp.data.length,
                 );
-                vendedores = [...resp.data];
+                vendedores = resp.data.map((u) => ({
+                    ...u,
+                    id: u.id,
+                    name:
+                        u.full_name || u.fullname || u.name || u.username || "",
+                    full_name:
+                        u.full_name || u.fullname || u.name || u.username || "",
+                    clients: Array.isArray(u.clients) ? u.clients : [],
+                }));
             }
         } catch (err) {
-            console.warn("[Visit] Usando lista de vendedores configurada");
+            console.warn("[Visit] Usando lista de vendedores configurada", err);
         }
     };
     const fetchApiVisit = async () => {
@@ -131,7 +141,7 @@
             const resp = await api.getData(
                 "visit/informe",
                 "",
-                `company_id=${Company}`,
+                `company_id=${company_id}`,
                 "",
                 schemaName,
             );
@@ -148,27 +158,63 @@
                 // Normalizar la respuesta de la API al shape interno usado por filtros,
                 // tarjetas y el formulario de edición.
                 visits = resp.data.map((v) => ({
-                    id:           v.id,
-                    vendedorId:   v.seller_id,
-                    vendedorName: v.users?.fullname   ?? "",
-                    clienteId:    v.customer_id,
-                    clienteName:  v.customers?.company_name ?? "",
-                    tipo:         v.type,
+                    id: v.id,
+                    vendedorId:
+                        v.seller_id ?? v.vendedorId ?? v.assigned_seller_id,
+                    vendedorName:
+                        v.users?.full_name ??
+                        v.users?.fullname ??
+                        v.user?.full_name ??
+                        v.user?.fullname ??
+                        v.vendedorName ??
+                        "",
+                    clienteId: v.customer_id ?? v.clienteId,
+                    clienteName:
+                        v.customers?.company_name ??
+                        v.customer?.company_name ??
+                        v.prospects?.company_name ??
+                        v.prospect?.company_name ??
+                        v.company_name ??
+                        v.clienteName ??
+                        "",
+                    tipo: (v.customer_type ?? "CRM_CUSTOMER").toUpperCase(),
                     // scheduled_at viene como ISO datetime → separar fecha y hora
-                    fecha:        v.scheduled_at ? dayjs(v.scheduled_at).format("YYYY-MM-DD") : "",
-                    hora:         v.scheduled_at ? dayjs(v.scheduled_at).format("HH:mm")      : "",
-                    direccion:    v.customers?.address        ?? "",
-                    contacto:     v.customers?.contact_person ?? "",
-                    telefono:     v.customers?.phone          ?? "",
-                    objetivo:     v.objetive ?? "",
-                    notas:        v.notas    ?? "",
-                    status:       v.status   ?? "PROGRAMADA",
-                    createdBy:    v.created_by ?? "",
-                    createdAt:    v.created_at ?? "",
+                    fecha:
+                        v.fecha ||
+                        (v.scheduled_at
+                            ? dayjs(v.scheduled_at).format("YYYY-MM-DD")
+                            : ""),
+                    hora:
+                        v.hora ||
+                        (v.scheduled_at
+                            ? dayjs(v.scheduled_at).format("HH:mm")
+                            : ""),
+                    direccion:
+                        v.customers?.address ??
+                        v.customer?.address ??
+                        v.prospect?.address ??
+                        v.direccion ??
+                        "",
+                    contacto:
+                        v.customers?.contact_person ??
+                        v.customers?.contact_name ??
+                        v.customer?.contact_name ??
+                        v.prospect?.contact_name ??
+                        v.contacto ??
+                        "",
+                    telefono:
+                        v.customers?.phone ??
+                        v.customer?.phone ??
+                        v.prospect?.phone ??
+                        v.telefono ??
+                        "",
+                    objetivo: v.objetive ?? v.objetivo ?? v.objective ?? "",
+                    notas: v.notas ?? "",
+                    status: (v.status ?? "PROGRAMADA").toUpperCase(),
                 }));
             }
         } catch (err) {
-            console.warn("[Visit] Usando lista de visitas configurada");
+            console.warn("[Visit] Usando lista de visitas configurada", err);
         }
     };
 
@@ -292,11 +338,13 @@
         };
 
         // Asignar primer cliente del vendedor activo
-        const v = vendedores.find((item) => item.id === currentVendId);
-        if (v && v.clients.length > 0) {
+        const v = vendedores.find(
+            (item) => String(item.id) === String(currentVendId),
+        );
+        if (v && v.clients && v.clients.length > 0) {
             form.clienteId = v.clients[0].id;
             form.clienteName = v.clients[0].full_name;
-            form.tipo = v.clients[0].type;
+            form.tipo = v.clients[0].costumer_type;
             form.direccion = v.clients[0].address || "";
             form.contacto = v.clients[0].contact || "";
             form.telefono = v.clients[0].phone || "";
@@ -324,19 +372,28 @@
         isEditing = true;
         editingId = visit.id;
         form = {
-            vendedorId:   visit.vendedorId   ?? visit.seller_id,
+            vendedorId: visit.vendedorId ?? visit.seller_id,
             vendedorName: visit.vendedorName ?? visit.users?.fullname ?? "",
-            clienteId:    visit.clienteId    ?? visit.customer_id,
-            clienteName:  visit.clienteName  ?? visit.customers?.company_name ?? "",
-            tipo:         visit.tipo         ?? visit.type,
+            clienteId: visit.clienteId ?? visit.customer_id,
+            clienteName:
+                visit.clienteName ?? visit.customers?.company_name ?? "",
+            tipo: visit.tipo ?? visit.costumer_type,
             // Si viene el campo ya separado lo usa; si no, parte el timestamp ISO
-            fecha: visit.fecha || (visit.scheduled_at ? dayjs(visit.scheduled_at).format("YYYY-MM-DD") : ""),
-            hora:  visit.hora  || (visit.scheduled_at ? dayjs(visit.scheduled_at).format("HH:mm")      : ""),
-            direccion: visit.direccion ?? visit.customers?.address        ?? "",
-            contacto:  visit.contacto  ?? visit.customers?.contact_person ?? "",
-            telefono:  visit.telefono  ?? visit.customers?.phone          ?? "",
-            objetivo:  visit.objetivo  ?? visit.objetive ?? "",
-            notas:     visit.notas     ?? "",
+            fecha:
+                visit.fecha ||
+                (visit.scheduled_at
+                    ? dayjs(visit.scheduled_at).format("YYYY-MM-DD")
+                    : ""),
+            hora:
+                visit.hora ||
+                (visit.scheduled_at
+                    ? dayjs(visit.scheduled_at).format("HH:mm")
+                    : ""),
+            direccion: visit.direccion ?? visit.customers?.address ?? "",
+            contacto: visit.contacto ?? visit.customers?.contact_person ?? "",
+            telefono: visit.telefono ?? visit.customers?.phone ?? "",
+            objetivo: visit.objetivo ?? visit.objetive ?? "",
+            notas: visit.notas ?? "",
         };
 
         showModal = true;
@@ -395,7 +452,10 @@
     // Filtrar visitas
     $: filteredVisits = visits.filter((v) => {
         // Filtro por Vendedor
-        if (filterVendedor !== "ALL" && v.vendedorId !== filterVendedor) {
+        if (
+            filterVendedor !== "ALL" &&
+            String(v.vendedorId) !== String(filterVendedor)
+        ) {
             return false;
         }
         // Filtro por Tipo de Cliente (CRM_CUSTOMER vs PROSPECT)
@@ -666,8 +726,8 @@
                                         >
                                         {#each vendedores as vend}
                                             <option value={vend.id}>
-                                                {vend.full_name} ({vend.clients
-                                                    .length} clientes)
+                                                {vend.full_name || vend.name} ({vend
+                                                    .clients?.length ?? 0} clientes)
                                             </option>
                                         {/each}
                                     </select>
@@ -713,7 +773,7 @@
                                             >
                                             {#each availableClients as cli}
                                                 <option value={cli.id}>
-                                                    {cli.name} — [{cli.type ===
+                                                    {cli.name} — [{cli.costumer_type ===
                                                     "CRM_CUSTOMER"
                                                         ? "Cliente CRM"
                                                         : "Prospecto"}]
@@ -1202,7 +1262,9 @@
                                 <div
                                     class="avatar-circle-sm bg-primary text-white"
                                 >
-                                    {visit.vendedorName}
+                                    {(visit.vendedorName || "V")
+                                        .charAt(0)
+                                        .toUpperCase()}
                                 </div>
                                 <div class="overflow-hidden">
                                     <div
